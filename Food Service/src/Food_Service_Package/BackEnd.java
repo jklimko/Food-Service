@@ -79,13 +79,6 @@ public class BackEnd extends JFrame {
 			
 			// Invoking the start() method 
 			thread.start();	
-			
-			if(din.readDouble() > 0) {
-				double temp = din.readDouble();
-				setTotal(temp);
-				}else{
-					break;
-				}
               
             }catch (Exception e){ 
             	
