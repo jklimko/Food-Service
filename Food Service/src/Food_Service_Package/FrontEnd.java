@@ -221,7 +221,7 @@ public class FrontEnd extends JFrame {
 	    
 	private void connectToServer() throws IOException{
 	    	showMessage("Attempting connection...\n");
-	    	connection = new Socket(InetAddress.getByName(serverIP), 1234);
+	    	connection = new Socket(InetAddress.getByName(serverIP), 1235);
 	    	connection.setTcpNoDelay(true);
 	    	showMessage("Connected to: " + connection.getInetAddress().getHostName());
 	}
