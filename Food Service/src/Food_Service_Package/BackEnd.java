@@ -16,34 +16,35 @@ public class BackEnd extends JFrame {
 
 	// private variables
 	double total = 0.00;
-	private static DataInputStream din;
-	private static JTextArea tfTotalDisplay;	
+	private JTextArea tfTotalDisplay;	
 	private static JTextArea SystemDisplay;
-	double temptTotal;
+	public double tempTotal;
 	
 	NumberFormat formatter = new DecimalFormat("#0.00");
 	
 	// Constructor to setup the GUI components
 	public BackEnd() { 
 		
+		//frame
 		setTitle("Backend");
 		setSize(300,500);
 		setLayout(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		
-		//basic total label
+		//basic label
 		JLabel lblTotal;                     // Declare an Label instance called lblInput
 		lblTotal = new JLabel("Total");   // Construct by invoking a constructor via the new operator
 		lblTotal.setBounds(75, 25, 100, 25);
 		add(lblTotal);
 		
-		//displays total  income from client
+		//displays total income from client
 		tfTotalDisplay = new JTextArea(); // Declare and allocate an TextField instance called tfInput
 		tfTotalDisplay.setBounds(125, 30, 150 , 18);		//where teh textfield is located
 		add(tfTotalDisplay);                          // "this" Container adds the TextField
 		tfTotalDisplay.setEditable(false) ;          // Set to read-only
 		tfTotalDisplay.setText(formatter.format(total));
 		
+		// just to display connection notifications
 		SystemDisplay = new JTextArea();
 		SystemDisplay.setBounds(25, 75, 250, 350);
 		add(SystemDisplay);
@@ -56,10 +57,10 @@ public class BackEnd extends JFrame {
         
         // running infinite loop for getting 
         // client request 
-	while (true){ 
-        	
+	while (true){       	
 		Socket s = null; 
-
+				
+		
 		try { 
 			// socket object to receive incoming client requests 
 			s = ss.accept();
@@ -67,48 +68,52 @@ public class BackEnd extends JFrame {
 			showMessage("New Client : \n" + s); 
                   
 			// obtaining input and out streams 
-			din = new DataInputStream(s.getInputStream()); 
+			DataInputStream din = new DataInputStream(s.getInputStream()); 
 			DataOutputStream dout = new DataOutputStream(s.getOutputStream()); 
                            
 			showMessage("\nAssigning new thread"); 
                               
 			// create a new thread object 
-			Thread thread = new ClientHandler(s, din, dout); 
-			
-
+			Thread thread = new ClientHandler(s, din, dout, BackEnd.this); 
 			
 			// Invoking the start() method 
 			thread.start();	
-              
+			
             }catch (Exception e){ 
-            	
-            	double tmpdata = din.readDouble();
-        		setTotal(tmpdata);
-        		
             		s.close(); 
                 e.printStackTrace(); 
             } 
         }
 	}
-
+	
 	private void showMessage(final String text) {
 		SwingUtilities.invokeLater(
 				new Runnable() {
 					public void run() {
 						SystemDisplay.append(text);
 					}
-				});
+				}
+		);
 	}
 	
-	private void setTotal(double temp) {
+	public void setTotal(double temp) {
 		SwingUtilities.invokeLater(
 				new Runnable() {
 					public void run() {
+						System.out.println(temp);
 						total = total+temp;
-						tfTotalDisplay.setText(formatter.format(total));
+						setDisplay(total);
 					}
 				}
 		);
+	}
+	
+	public void setDisplay(double temp) {
+		tfTotalDisplay.setText(formatter.format(temp));
+	}
+	public void getTemp(double temp) {
+		tempTotal = tempTotal + temp;
+		System.out.println(tempTotal);
 	}
 	
 	// The entry main() method
@@ -118,25 +123,23 @@ public class BackEnd extends JFrame {
 		BE.setVisible(true);
 		BE.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		BE.startRunning();
-		while(true) {
-		double temp = din.readDouble();
-		BE.setTotal(temp);
-		}
 	}
 };
 	
-	// ClientHandler class 
+// ClientHandler class 
 class ClientHandler extends Thread  { 
 	final DataInputStream dis; 
 	final DataOutputStream dos; 
 	final Socket s;	
-	private double rec;
+	public double temp;
+	BackEnd BE = new BackEnd();
 		    
 	// Constructor 
-	public ClientHandler(Socket s, DataInputStream in, DataOutputStream dos) throws IOException { 
+	public ClientHandler(Socket s, DataInputStream in, DataOutputStream dos, BackEnd backend) throws IOException { 
 		this.s = s; 
 		this.dis = in; 
 		this.dos = dos;
+		this.BE = backend;
 	} 
 		  
 	@Override
@@ -145,11 +148,12 @@ class ClientHandler extends Thread  {
 		//String to return; 
 		while (true) { 
 			try { 
-		            
-				rec = dis.readDouble();
-				System.out.println(rec);
+		        
+				BE.tempTotal = dis.readDouble();
+				BE.setTotal(BE.tempTotal);
+				//System.out.println(BE.tempTotal);
 		            	   
-				if(rec == -1){  
+				if(temp == -1){  
 					System.out.println("Client " + this.s + " sends exit..."); 
 					System.out.println("Closing this connection."); 
 					this.s.close(); 
@@ -173,9 +177,10 @@ class ClientHandler extends Thread  {
 	}
 		    
 	public double getTotal() {
-		return(rec);
+		return(temp);
 	}
 	
 }; 
+
 
 
