@@ -18,7 +18,7 @@ public class BackEnd extends JFrame {
 	double total = 0.00;
 	private JTextArea tfTotalDisplay;	
 	private static JTextArea SystemDisplay;
-	public double tempTotal;
+	public double Total;
 	
 	NumberFormat formatter = new DecimalFormat("#0.00");
 	
@@ -100,7 +100,6 @@ public class BackEnd extends JFrame {
 		SwingUtilities.invokeLater(
 				new Runnable() {
 					public void run() {
-						System.out.println(temp);
 						total = total+temp;
 						setDisplay(total);
 					}
@@ -111,10 +110,11 @@ public class BackEnd extends JFrame {
 	public void setDisplay(double temp) {
 		tfTotalDisplay.setText(formatter.format(temp));
 	}
-	public void getTemp(double temp) {
-		tempTotal = tempTotal + temp;
-		System.out.println(tempTotal);
-	}
+	
+	//public void getTemp(double temp) {
+	//	Total = Total + temp;
+	//	System.out.println(Total);
+	//}
 	
 	// The entry main() method
 	public static void main(String[] args) throws IOException {
@@ -130,8 +130,7 @@ public class BackEnd extends JFrame {
 class ClientHandler extends Thread  { 
 	final DataInputStream dis; 
 	final DataOutputStream dos; 
-	final Socket s;	
-	public double temp;
+	final Socket s;
 	BackEnd BE = new BackEnd();
 		    
 	// Constructor 
@@ -149,8 +148,8 @@ class ClientHandler extends Thread  {
 		while (true) { 
 			try { 
 		        
-				BE.tempTotal = dis.readDouble();
-				BE.setTotal(BE.tempTotal);
+				double temp = dis.readDouble();
+				BE.setTotal(temp);
 				//System.out.println(BE.tempTotal);
 		            	   
 				if(temp == -1){  
@@ -176,9 +175,9 @@ class ClientHandler extends Thread  {
 		} 
 	}
 		    
-	public double getTotal() {
-		return(temp);
-	}
+	//public double getTotal() {
+	//	return(temp);
+	//}
 	
 }; 
 
