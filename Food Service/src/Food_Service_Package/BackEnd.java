@@ -1,6 +1,6 @@
 package Food_Service_Package;
 
-import javax.swing.JFrame;  // Using Frame class in package java.awt
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
@@ -14,7 +14,7 @@ import java.text.NumberFormat;
 //This subclass inherits all properties from Frame, e.g., title, icon, buttons, content-pane
 public class BackEnd extends JFrame {
 
-	// private variables
+	// variables
 	double total = 0.00;
 	private JTextArea tfTotalDisplay;	
 	private static JTextArea SystemDisplay;
@@ -39,7 +39,7 @@ public class BackEnd extends JFrame {
 		
 		//displays total income from client
 		tfTotalDisplay = new JTextArea(); // Declare and allocate an TextField instance called tfInput
-		tfTotalDisplay.setBounds(125, 30, 150 , 18);		//where teh textfield is located
+		tfTotalDisplay.setBounds(125, 30, 150 , 18);		//where the textfield is located
 		add(tfTotalDisplay);                          // "this" Container adds the TextField
 		tfTotalDisplay.setEditable(false) ;          // Set to read-only
 		tfTotalDisplay.setText(formatter.format(total));
@@ -52,15 +52,13 @@ public class BackEnd extends JFrame {
 		
 	}
 	
+	//Server that is constantly listening for new client requests and will make a new thread if there is one. 
 	public void startRunning() throws IOException {
 		ServerSocket ss = new ServerSocket(1235); 
         
-        // running infinite loop for getting 
-        // client request 
+        // running infinite loop for getting client request 
 	while (true){       	
 		Socket s = null; 
-				
-		
 		try { 
 			// socket object to receive incoming client requests 
 			s = ss.accept();
@@ -86,6 +84,7 @@ public class BackEnd extends JFrame {
         }
 	}
 	
+	//updates a display to show any messages coming from the server
 	private void showMessage(final String text) {
 		SwingUtilities.invokeLater(
 				new Runnable() {
@@ -96,6 +95,7 @@ public class BackEnd extends JFrame {
 		);
 	}
 	
+	//adds any additions to the running totaal and calls the setDisplay method to update the gui
 	public void setTotal(double temp) {
 		SwingUtilities.invokeLater(
 				new Runnable() {
@@ -107,18 +107,15 @@ public class BackEnd extends JFrame {
 		);
 	}
 	
+	//method to update the display with the correct double
 	public void setDisplay(double temp) {
 		tfTotalDisplay.setText(formatter.format(temp));
 	}
 	
-	//public void getTemp(double temp) {
-	//	Total = Total + temp;
-	//	System.out.println(Total);
-	//}
 	
 	// The entry main() method
 	public static void main(String[] args) throws IOException {
-		// Invoke the constructor (to setup the GUI) by allocating an instance
+		// Invoke the constructor (to setup the GUI) by allocating an instance and begins to run the server
 		BackEnd BE = new BackEnd();
 		BE.setVisible(true);
 		BE.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -142,29 +139,25 @@ class ClientHandler extends Thread  {
 	} 
 		  
 	@Override
-	public void run() { 
-		        
+	public void run() { 		        
 		//String to return; 
 		while (true) { 
-			try { 
-		        
+			try { 	        
 				double temp = dis.readDouble();
 				BE.setTotal(temp);
-				//System.out.println(BE.tempTotal);
-		            	   
-				if(temp == -1){  
+					            	   
+				if(temp <= -1){  
 					System.out.println("Client " + this.s + " sends exit..."); 
 					System.out.println("Closing this connection."); 
 					this.s.close(); 
 					System.out.println("Connection closed"); 
 					break; 
 				} 
-
 			} catch (IOException e) { 
 	    			e.printStackTrace(); 
 			} 
 		} 
-		          
+		
 		try{ 
 			// closing resources 
 			this.dis.close(); 
@@ -174,10 +167,6 @@ class ClientHandler extends Thread  {
 			e.printStackTrace(); 
 		} 
 	}
-		    
-	//public double getTotal() {
-	//	return(temp);
-	//}
 	
 }; 
 
