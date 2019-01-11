@@ -149,12 +149,10 @@ public class BackEnd extends JFrame {
 			DataInputStream din = new DataInputStream(s.getInputStream()); 
 			DataOutputStream dout = new DataOutputStream(s.getOutputStream()); 
                            
-			 
+			showMessage("\nAssigning new thread");
                               
 			// create a new thread object 
-			Thread thread = new ClientHandler(s, din, dout, BackEnd.this); 
-			
-			showMessage("\nAssigning new thread");
+			Thread thread = new ClientHandler(s, din, dout, BackEnd.this); 			
 			
 			// Invoking the start() method 
 			thread.start();	
