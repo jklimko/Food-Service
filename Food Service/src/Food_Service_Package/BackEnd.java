@@ -6,6 +6,7 @@ import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.awt.Font;
 import java.io.*;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -15,38 +16,117 @@ import java.text.NumberFormat;
 public class BackEnd extends JFrame {
 
 	// variables
-	double total = 0.00;
-	private JTextArea tfTotalDisplay;	
+	private double total = 0.00;
+	private int transCount = 0;
+	private int burgersSold = 0;
+	private int friesSold = 0;
+	private int drinksSold = 0;
+	
+	private JTextArea tfTotalDisplay;
+	private JTextArea tfTotalTransDisplay;
+	private JTextArea tfBurgersSoldDisplay;
+	private JTextArea tfFriesSoldDisplay;
+	private JTextArea tfDrinksSoldDisplay;
 	private static JTextArea SystemDisplay;
-	public double Total;
+	
 	
 	NumberFormat formatter = new DecimalFormat("#0.00");
+	//NumberFormat formatterInt  = new IntFormat("#0");
 	
 	// Constructor to setup the GUI components
 	public BackEnd() { 
 		
 		//frame
 		setTitle("Backend");
-		setSize(300,500);
+		setSize(600,500);
 		setLayout(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		
-		//basic label
-		JLabel lblTotal;                     // Declare an Label instance called lblInput
-		lblTotal = new JLabel("Total");   // Construct by invoking a constructor via the new operator
-		lblTotal.setBounds(75, 25, 100, 25);
+		//Data Column label
+		JLabel lblData;
+		lblData = new JLabel("Data");
+		lblData.setBounds(20, 5, 100, 25);
+		lblData.setFont(new Font("Impact", Font.BOLD, 24));
+		add(lblData);
+		
+		//"Total" label
+		JLabel lblTotal;                   
+		lblTotal = new JLabel("Total");   
+		lblTotal.setBounds(20, 40, 100, 25);
 		add(lblTotal);
 		
 		//displays total income from client
 		tfTotalDisplay = new JTextArea(); // Declare and allocate an TextField instance called tfInput
-		tfTotalDisplay.setBounds(125, 30, 150 , 18);		//where the textfield is located
+		tfTotalDisplay.setBounds(20, 65, 150 , 18);		//where the textfield is located
 		add(tfTotalDisplay);                          // "this" Container adds the TextField
 		tfTotalDisplay.setEditable(false) ;          // Set to read-only
 		tfTotalDisplay.setText(formatter.format(total));
 		
+		//"transaction Count" label
+		JLabel lblTotalTrans;                     
+		lblTotalTrans = new JLabel("Transation Count");  
+		lblTotalTrans.setBounds(20, 90, 150, 25);
+		add(lblTotalTrans);
+		
+		//displays total # of transactions from  all clients
+		
+		tfTotalTransDisplay = new JTextArea();
+		tfTotalTransDisplay.setBounds(20, 115, 150 , 18);		
+		add(tfTotalTransDisplay);                          
+		tfTotalTransDisplay.setEditable(false) ;        
+		tfTotalTransDisplay.setText("" + transCount);
+		
+		//"total Burgers Sold" label
+		JLabel lblBurgerSold;                     
+		lblBurgerSold = new JLabel("Total Burgers Sold");  
+		lblBurgerSold.setBounds(20, 140, 150, 25);
+		add(lblBurgerSold);
+				
+		//displays total # of transactions from  all clients
+		tfBurgersSoldDisplay = new JTextArea();
+		tfBurgersSoldDisplay.setBounds(20, 165, 150 , 18);		
+		add(tfBurgersSoldDisplay);                          
+		tfBurgersSoldDisplay.setEditable(false) ;        
+		tfBurgersSoldDisplay.setText("" + burgersSold);
+				
+		//"total Fries Sold" label
+		JLabel lblFriesSold;                     
+		lblFriesSold = new JLabel("Total Fries Sold");  
+		lblFriesSold.setBounds(20, 190, 150, 25);
+		add(lblFriesSold);
+						
+		//displays total # of transactions from  all clients
+		tfFriesSoldDisplay = new JTextArea();
+		tfFriesSoldDisplay.setBounds(20, 215, 150 , 18);		
+		add(tfFriesSoldDisplay);                          
+		tfFriesSoldDisplay.setEditable(false) ;        
+		tfFriesSoldDisplay.setText("" + friesSold);
+		
+		//"total Drinks Sold" label
+		JLabel lblDrinksSold;                     
+		lblDrinksSold = new JLabel("Total Drinks Sold");  
+		lblDrinksSold.setBounds(20, 240, 150, 25);
+		add(lblDrinksSold);
+				
+		//displays total # of transactions from  all clients
+		tfDrinksSoldDisplay = new JTextArea();
+		tfDrinksSoldDisplay.setBounds(20, 265, 150 , 18);		
+		add(tfDrinksSoldDisplay);                          
+		tfDrinksSoldDisplay.setEditable(false) ;        
+		tfDrinksSoldDisplay.setText("" + drinksSold);
+		
+		
+		
+		//Connection Info Display label
+		JLabel lblConnectionInfo;
+		lblConnectionInfo = new JLabel("Connection Information");
+		lblConnectionInfo.setBounds(300, 5, 250, 25);
+		lblConnectionInfo.setFont(new Font("Impact", Font.BOLD, 24));
+		add(lblConnectionInfo);
+						
 		// just to display connection notifications
 		SystemDisplay = new JTextArea();
-		SystemDisplay.setBounds(25, 75, 250, 350);
+		SystemDisplay.setBounds(300, 40, 250, 350);
 		add(SystemDisplay);
 		SystemDisplay.setEditable(false);
 		
@@ -69,10 +149,12 @@ public class BackEnd extends JFrame {
 			DataInputStream din = new DataInputStream(s.getInputStream()); 
 			DataOutputStream dout = new DataOutputStream(s.getOutputStream()); 
                            
-			showMessage("\nAssigning new thread"); 
+			 
                               
 			// create a new thread object 
 			Thread thread = new ClientHandler(s, din, dout, BackEnd.this); 
+			
+			showMessage("\nAssigning new thread");
 			
 			// Invoking the start() method 
 			thread.start();	
@@ -96,20 +178,27 @@ public class BackEnd extends JFrame {
 	}
 	
 	//adds any additions to the running totaal and calls the setDisplay method to update the gui
-	public void setTotal(double temp) {
+	public void setDisplay(double tempTotal, int tempTransCount, int tempBurgerSold, int tempFriesSold, int tempDrinksSold) {
 		SwingUtilities.invokeLater(
 				new Runnable() {
 					public void run() {
-						total = total+temp;
-						setDisplay(total);
+						total = total+tempTotal;
+						tfTotalDisplay.setText(formatter.format(total));
+						
+						transCount = transCount + tempTransCount;
+						tfTotalTransDisplay.setText("" + transCount);
+						
+						burgersSold = burgersSold + tempBurgerSold;
+						tfBurgersSoldDisplay.setText("" + burgersSold);
+						
+						friesSold = friesSold + tempFriesSold; 
+						tfFriesSoldDisplay.setText("" + friesSold);
+						
+						drinksSold = drinksSold + tempDrinksSold;
+						tfDrinksSoldDisplay.setText("" + drinksSold);	
 					}
 				}
 		);
-	}
-	
-	//method to update the display with the correct double
-	public void setDisplay(double temp) {
-		tfTotalDisplay.setText(formatter.format(temp));
 	}
 	
 	
@@ -143,10 +232,23 @@ class ClientHandler extends Thread  {
 		//String to return; 
 		while (true) { 
 			try { 	        
-				double temp = dis.readDouble();
-				BE.setTotal(temp);
+				
+				double tempTotal = dis.readDouble();
+				
+				int tempTransactionCount = dis.readInt();
+				//System.out.println(tempTransactionCount);	
+				
+				int tempBurgerSold = dis.readInt();
+				//System.out.println(tempBurgerSold);
+				
+				int tempFriesSold = dis.readInt();
+				
+				int tempDrinksSold = dis.readInt();
+				
+				BE.setDisplay(tempTotal, tempTransactionCount, tempBurgerSold, tempFriesSold, tempDrinksSold);
 					            	   
-				if(temp <= -1){  
+				
+				if(tempTotal <= -1){  
 					System.out.println("Client " + this.s + " sends exit..."); 
 					System.out.println("Closing this connection."); 
 					this.s.close(); 
