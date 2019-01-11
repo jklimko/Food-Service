@@ -9,6 +9,7 @@ Application that consists of a client side (Front End) and a server side(Back En
 
 #### @TO DO ####
 * Improving client GUI
-* Pass more transacion data from clients to server(and update server gui accordingly)
+    - Add error messages and protection if something is wronge when "Complete transaction" buttton is pressed
+*  DONE Pass more transacion data from clients to server(and update server gui accordingly)
 * Save data in a type of SQL database
 * Create android app which has similar functionality as desktop app and connects tot he same backend
