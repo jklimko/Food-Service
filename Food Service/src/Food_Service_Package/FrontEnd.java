@@ -18,9 +18,9 @@ public class FrontEnd extends JFrame {
     NumberFormat formatter = new DecimalFormat("#0.00");
     
     //keep track of units sold
-    private static int burger = 0;
-    private static int fries = 0;
-    private static int drink = 0;
+    private static int burgersSold = 0;
+    private static int friesSold = 0;
+    private static int drinksSold = 0;
     private int transactionCount;
     
     //gui elements
@@ -34,7 +34,6 @@ public class FrontEnd extends JFrame {
     	private Socket connection;
    
     
-
 	//constructor
     	public FrontEnd(String host) {
 		
@@ -116,13 +115,14 @@ public class FrontEnd extends JFrame {
 	    add(btnComplete);
 	    btnComplete.addActionListener(new ActionListener() {
 	    		public void actionPerformed(ActionEvent e) {
-	    			sendMessage(total); 
-	    			total = 0.00;
+	    			incrementTrans();
+	    			sendMessage(); 
+	    			Deconstructor();
 	    			txtpnItemlist.setText("");
 	    			TotalDisplay.setText("");
 	    			Payment.setText("");
 	    			txtpnChangedisplay.setText(""); 
-	    			incrementTrans();        //incriments total transactions completed (maybe put after payment error?)
+	    			        //incriments total transactions completed (maybe put after payment error?)
 	    		}
 	    });
 	        
@@ -134,8 +134,8 @@ public class FrontEnd extends JFrame {
 	    add(btnBurger);      
 	    btnBurger.addActionListener(new ActionListener() {
 	    		public void actionPerformed(ActionEvent e) {
-	    			txtpnItemlist.append("Burger..........$3.00\r\n");
-	    			setTotal(3.00);                
+	    			txtpnItemlist.append("Burger..........$5.00\r\n");
+	    			setTotal(5.00);                
 	    			incrimentBurger();
 	    		}
 	    });
@@ -146,8 +146,8 @@ public class FrontEnd extends JFrame {
 	    add(btnFries);         
 	    btnFries.addActionListener(new ActionListener() {
 	    		public void actionPerformed(ActionEvent e) {
-	    			txtpnItemlist.append("Fries..........$2.00\r\n");
-	    			setTotal(2.00);
+	    			txtpnItemlist.append("Fries..........$3.00\r\n");
+	    			setTotal(3.00);
 	    			incrimentFries();
 	    		}
 	    });
@@ -172,38 +172,30 @@ public class FrontEnd extends JFrame {
 	}
 	
 	public void incrimentBurger(){
-		burger++;
+		burgersSold++;
 	}
 
 	public void incrimentFries(){
-		fries++;
+		friesSold++;
 	}
 
 	public void incrimentDrink() {
-		drink++;
+		drinksSold++;
 	}
  
 	public void incrementTrans(){
 		transactionCount++;
 	}
-	    
-	public static double getTotal() {
-		return total;
-	}
-	   
-	public static int getBurger() {
-		return burger;
-	}
-
-	public static int getFries() {
-		return fries;
+	
+	public void Deconstructor() {
+		total = 0.00;
+		transactionCount = 0;
+		burgersSold = 0;
+		friesSold = 0;
+		drinksSold = 0;
+		
 	}
 	    
-	public static int getDrink() {
-		return drink;
-	}
-	    
-	 
 	    
 	public void startRunning() {
 		try {
@@ -221,7 +213,7 @@ public class FrontEnd extends JFrame {
 	    
 	private void connectToServer() throws IOException{
 	    	showMessage("Attempting connection...\n");
-	    	connection = new Socket(InetAddress.getByName(serverIP), 1234);
+	    	connection = new Socket(InetAddress.getByName(serverIP), 1235);
 	    	connection.setTcpNoDelay(true);
 	    	showMessage("Connected to: " + connection.getInetAddress().getHostName());
 	}
@@ -255,9 +247,13 @@ public class FrontEnd extends JFrame {
 		}
 	}
 		
-	private void sendMessage(double total) {
+	private void sendMessage() {
 		try {
 			output.writeDouble(total);
+			output.writeInt(transactionCount);
+			output.writeInt(burgersSold);
+			output.writeInt(friesSold);
+			output.writeInt(drinksSold);
 			output.flush();	
 		}catch(IOException ioException) {
 			txtpnItemlist.append("\n Something went wrong!");
@@ -286,10 +282,11 @@ public class FrontEnd extends JFrame {
 		
 		
 	public static void main(String[] args) {
-		FrontEnd charlie;
-		charlie = new FrontEnd("127.0.0.1");
-		charlie.setVisible(true);
-		charlie.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		charlie.startRunning();
-		}
+		FrontEnd FE;
+		FE = new FrontEnd("127.0.0.1");
+		FE.setVisible(true);
+		FE.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		FE.startRunning();
+	}
+	
 };
